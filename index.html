@@ -25,11 +25,11 @@
         <main>
             <div class="info-grid">
                 <!-- Baris 1: Kontrol Utama -->
-                <div class="info-card search-box">
-                    <span class="icon">🔍</span>
+                <div class="info-card search-box" style="grid-area: search;">
+
                     <input type="text" id="search-input" placeholder="Cari server...">
                 </div>
-                <div class="info-card" id="country-filter-container">
+                <div class="info-card" id="country-filter-container" style="grid-area: country;">
                     <span class="icon">🌍</span>
                     <div class="custom-dropdown">
                         <div class="dropdown-selected" tabindex="0">
@@ -40,14 +40,32 @@
                         </div>
                     </div>
                 </div>
-                <div class="info-card" id="settings-btn">
+                <div class="info-card" id="settings-btn" style="grid-area: settings;">
                     <span class="icon">⚙️</span>
                     <div>
                         <h4>Pengaturan</h4>
                     </div>
                 </div>
 
-                <!-- Baris 2 Dihapus -->
+                <!-- Baris 2: Info & URL Kustom -->
+                <div class="info-card" id="worker-input-card" style="grid-area: worker;">
+
+                    <input type="text" id="ping-worker-url" placeholder="URL Ping Kustom...">
+                </div>
+                <div class="info-card" style="grid-area: provider;">
+
+                    <div>
+                        <p>Provider</p>
+                        <h4 id="isp-info">Mendeteksi...</h4>
+                    </div>
+                </div>
+                <div class="info-card" style="grid-area: location;">
+
+                    <div>
+                        <p>Lokasi</p>
+                        <h4 id="location-info">Mendeteksi...</h4>
+                    </div>
+                </div>
             </div>
 
             <div class="server-list-container" id="server-list">

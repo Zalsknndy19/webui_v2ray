@@ -92,6 +92,9 @@ header {
 .info-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    grid-template-areas:
+        "search country settings"
+        "worker provider location";
     gap: 15px;
     margin: 20px 0;
 }
@@ -104,7 +107,6 @@ header {
     align-items: center; /* Menengahkan secara horizontal */
     justify-content: center; /* Menengahkan secara vertikal */
     text-align: center;
-    gap: 8px; /* Mengurangi jarak antara ikon dan teks */
     transition: all 0.2s ease;
 }
 
@@ -123,11 +125,6 @@ header {
     cursor: pointer;
 }
 
-.info-card .icon {
-    font-size: 1.8em;
-    color: var(--cyber-cyan);
-    text-shadow: 0 0 5px var(--cyber-cyan);
-}
 .info-card p {
     font-size: 0.9em;
     color: #aaa;
@@ -245,27 +242,18 @@ header {
     height: 100%;
     background-color: transparent;
     border: none; /* Hapus border dari input */
-    padding: 15px 15px 15px 50px; /* Sesuaikan padding untuk ikon */
+    padding: 15px; /* Hapus padding ekstra untuk ikon */
     color: var(--text-light);
     font-size: 1em;
     font-family: var(--font-main);
     transition: all 0.2s ease;
+    text-align: center; /* Tengahkan placeholder */
 }
 
 .search-box input:focus {
     outline: none;
     border-color: var(--cyber-cyan);
     box-shadow: 0 0 10px var(--cyber-cyan);
-}
-
-.search-box .icon {
-    position: absolute;
-    left: 15px; /* Sesuaikan posisi kiri */
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--cyber-cyan);
-    text-shadow: 0 0 5px var(--cyber-cyan);
-    pointer-events: none; /* Agar tidak bisa diklik */
 }
 
 .control-buttons {
@@ -389,6 +377,31 @@ header {
     border-color: var(--danger-color);
 }
 
+/* --- Gaya Input Worker Ping --- */
+#worker-input-card {
+    padding: 0;
+    position: relative;
+}
+
+#ping-worker-url {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    padding: 15px;
+    color: var(--text-light);
+    font-size: 1em;
+    font-family: var(--font-main);
+    transition: all 0.2s ease;
+    text-align: center; /* Menengahkan placeholder */
+}
+
+#ping-worker-url:focus {
+    outline: none;
+    border-color: var(--cyber-cyan);
+    box-shadow: 0 0 10px var(--cyber-cyan);
+}
+
 /* --- Gaya Dropdown Kustom --- */
 #country-filter-container {
     /* Padding now inherited from .info-card for consistency */
@@ -473,8 +486,14 @@ header {
 /* --- Responsif untuk Seluler --- */
 @media (max-width: 768px) {
     .info-grid {
-        grid-template-columns: 1fr; /* Ubah ke 1 kolom di seluler untuk tata letak yang bersih */
-        gap: 8px; /* Mengurangi jarak antar kartu */
+        grid-template-columns: repeat(2, 1fr); /* 2 kolom untuk baris pertama */
+        grid-template-areas:
+            "search worker"  /* Cari & URL Kustom di baris 1 */
+            "country country" /* Negara di baris 2, mengambil lebar penuh */
+            "settings settings" /* Pengaturan di baris 3 */
+            "provider provider" /* Provider di baris 4 */
+            "location location"; /* Lokasi di baris 5 */
+        gap: 8px;
     }
 
     .info-card {

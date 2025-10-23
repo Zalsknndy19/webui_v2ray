@@ -11,8 +11,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Referensi Elemen DOM ---
     const serverListContainer = document.getElementById('server-list');
     const searchInput = document.getElementById('search-input');
+    const pingWorkerUrlInput = document.getElementById('ping-worker-url');
     const selectedCountBtn = document.getElementById('selected-count-btn');
     const repingBtn = document.getElementById('reping-btn');
+    const ispInfo = document.getElementById('isp-info');
+    const locationInfo = document.getElementById('location-info');
     const settingsBtn = document.getElementById('settings-btn');
     const exportBtn = document.getElementById('export-btn');
     const modalOverlay = document.getElementById('settings-modal-overlay');
@@ -39,6 +42,50 @@ document.addEventListener('DOMContentLoaded', function() {
     // FUNGSI INTI & PEMBANTU
     // =======================================================
 
+    function setupPingWorkerUrl() {
+        // Selalu gunakan URL default sebagai dasar, tetapi biarkan input bisa kosong
+        activePingTesterUrl = DEFAULT_PING_TESTER_URL;
+        let savedUrl = localStorage.getItem('pingTesterUrl');
+
+        if (savedUrl) {
+            // PERBAIKAN: Pastikan URL yang tersimpan menggunakan HTTPS
+            savedUrl = savedUrl.trim();
+            if (!savedUrl.startsWith('http://') && !savedUrl.startsWith('https://')) {
+                savedUrl = 'https://' + savedUrl;
+            }
+            if (savedUrl.startsWith('http://')) {
+                savedUrl = savedUrl.replace('http://', 'https://');
+            }
+            pingWorkerUrlInput.value = savedUrl;
+            activePingTesterUrl = savedUrl;
+        }
+        // Jangan set nilai default ke input field, biarkan placeholder yang bekerja
+
+        pingWorkerUrlInput.addEventListener('change', () => {
+            let newUrl = pingWorkerUrlInput.value.trim();
+            if (newUrl) {
+                // PERBAIKAN: Pastikan URL selalu HTTPS untuk menghindari redirect yang mengubah POST menjadi GET.
+                if (!newUrl.startsWith('http://') && !newUrl.startsWith('https://')) {
+                    newUrl = 'https://' + newUrl;
+                }
+                if (newUrl.startsWith('http://')) {
+                    newUrl = newUrl.replace('http://', 'https://');
+                }
+
+                activePingTesterUrl = newUrl;
+                pingWorkerUrlInput.value = newUrl; // Tampilkan URL yang sudah dikoreksi kepada pengguna
+                localStorage.setItem('pingTesterUrl', newUrl);
+                showToast('URL Worker Ping diperbarui. Tekan Test Ping untuk memulai.');
+            } else {
+                // Jika pengguna mengosongkan input, kembali ke default
+                activePingTesterUrl = DEFAULT_PING_TESTER_URL;
+                localStorage.removeItem('pingTesterUrl');
+                pingWorkerUrlInput.value = ''; // Kosongkan input untuk menampilkan placeholder
+                showToast('URL Worker Ping dikembalikan ke default.');
+            }
+        });
+    }
+
     function generateUUIDv4() {
         return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
             (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
@@ -61,8 +108,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function initializeApp() {
-        // setupPingWorkerUrl(); // Dihapus
-        // detectUserInfo(); // Dihapus
+        setupPingWorkerUrl();
+        detectUserInfo();
         populateSettingsFromUrl();
         try {
             serverListContainer.innerHTML = '<p>Mengunduh daftar server...</p>';
@@ -175,6 +222,20 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         // pingAllVisibleServers(); // Dihapus untuk mencegah ping otomatis
+    }
+
+    async function detectUserInfo() {
+        try {
+            const response = await fetch('https://ipinfo.io/json');
+            if (!response.ok) throw new Error('Response not OK');
+            const data = await response.json();
+            ispInfo.textContent = data.org || 'N/A';
+            locationInfo.textContent = `${data.city || ''}, ${data.country || ''}`;
+        } catch (error) {
+            console.warn("Gagal mendeteksi info pengguna:", error);
+            ispInfo.textContent = 'N/A';
+            locationInfo.textContent = 'N/A';
+        }
     }
 
     function populateSettingsFromUrl() {
