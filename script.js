@@ -1,24 +1,30 @@
 // ==========================================================
-// script.js (v6.0 - The Grand Finale, with Ping)
-// ZHStore VPN Configurator
+// script.js (v7.0 - Worker-Based Ping)
+// Heavenly Demons Configurator
 // ==========================================================
 
 document.addEventListener('DOMContentLoaded', function() {
     // --- PENGATURAN ---
     const PROXY_LIST_URL = 'https://raw.githubusercontent.com/FoolVPN-ID/Nautica/main/proxyList.txt';
+    const DEFAULT_PING_TESTER_URL = 'https://ping-tester-worker.zallstore.workers.dev'; // URL Worker Ping Default
 
     // --- Referensi Elemen DOM ---
     const serverListContainer = document.getElementById('server-list');
-    const countryFilter = document.getElementById('country-filter');
     const searchInput = document.getElementById('search-input');
+    const pingWorkerUrlInput = document.getElementById('ping-worker-url');
     const selectedCountBtn = document.getElementById('selected-count-btn');
+    const repingBtn = document.getElementById('reping-btn');
     const ispInfo = document.getElementById('isp-info');
     const locationInfo = document.getElementById('location-info');
-    const workerInfoCard = document.getElementById('worker-info');
     const settingsBtn = document.getElementById('settings-btn');
     const exportBtn = document.getElementById('export-btn');
     const modalOverlay = document.getElementById('settings-modal-overlay');
     const settingsDoneBtn = document.getElementById('settings-done-btn');
+
+    // Elemen Dropdown Kustom
+    const customDropdown = document.querySelector('.custom-dropdown');
+    const selectedCountryEl = document.getElementById('selected-country');
+    const countryOptionsContainer = document.getElementById('country-options');
 
     const bugCdnInput = document.getElementById('bug-cdn-input');
     const workerHostInput = document.getElementById('worker-host-input');
@@ -30,10 +36,55 @@ document.addEventListener('DOMContentLoaded', function() {
     let allServers = [];
     let selectedServers = new Set();
     let isShowingOnlySelected = false;
+    let activePingTesterUrl = DEFAULT_PING_TESTER_URL;
 
     // =======================================================
     // FUNGSI INTI & PEMBANTU
     // =======================================================
+
+    function setupPingWorkerUrl() {
+        // Selalu gunakan URL default sebagai dasar, tetapi biarkan input bisa kosong
+        activePingTesterUrl = DEFAULT_PING_TESTER_URL;
+        let savedUrl = localStorage.getItem('pingTesterUrl');
+
+        if (savedUrl) {
+            // PERBAIKAN: Pastikan URL yang tersimpan menggunakan HTTPS
+            savedUrl = savedUrl.trim();
+            if (!savedUrl.startsWith('http://') && !savedUrl.startsWith('https://')) {
+                savedUrl = 'https://' + savedUrl;
+            }
+            if (savedUrl.startsWith('http://')) {
+                savedUrl = savedUrl.replace('http://', 'https://');
+            }
+            pingWorkerUrlInput.value = savedUrl;
+            activePingTesterUrl = savedUrl;
+        }
+        // Jangan set nilai default ke input field, biarkan placeholder yang bekerja
+
+        pingWorkerUrlInput.addEventListener('change', () => {
+            let newUrl = pingWorkerUrlInput.value.trim();
+            if (newUrl) {
+                // PERBAIKAN: Pastikan URL selalu HTTPS untuk menghindari redirect yang mengubah POST menjadi GET.
+                if (!newUrl.startsWith('http://') && !newUrl.startsWith('https://')) {
+                    newUrl = 'https://' + newUrl;
+                }
+                if (newUrl.startsWith('http://')) {
+                    newUrl = newUrl.replace('http://', 'https://');
+                }
+
+                activePingTesterUrl = newUrl;
+                pingWorkerUrlInput.value = newUrl; // Tampilkan URL yang sudah dikoreksi kepada pengguna
+                localStorage.setItem('pingTesterUrl', newUrl);
+                showToast('URL Worker Ping diperbarui. Tekan Test Ping untuk memulai.');
+            } else {
+                // Jika pengguna mengosongkan input, kembali ke default
+                activePingTesterUrl = DEFAULT_PING_TESTER_URL;
+                localStorage.removeItem('pingTesterUrl');
+                pingWorkerUrlInput.value = ''; // Kosongkan input untuk menampilkan placeholder
+                showToast('URL Worker Ping dikembalikan ke default.');
+            }
+        });
+    }
 
     function generateUUIDv4() {
         return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
@@ -57,6 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function initializeApp() {
+        setupPingWorkerUrl();
         detectUserInfo();
         populateSettingsFromUrl();
         try {
@@ -89,13 +141,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function populateCountryFilter(servers) {
+        countryOptionsContainer.innerHTML = ''; // Bersihkan opsi lama
+
+        // Tambahkan opsi "Pilih Negara" sebagai default
+        const allOption = document.createElement('div');
+        allOption.className = 'option selected';
+        allOption.dataset.value = 'all';
+        allOption.textContent = 'Pilih Negara';
+        allOption.addEventListener('click', () => selectCountry('all', 'Pilih Negara'));
+        countryOptionsContainer.appendChild(allOption);
+
         const countries = [...new Set(servers.map(s => s.country_code))].sort();
         countries.forEach(code => {
-            const option = document.createElement('option');
-            option.value = code;
+            const option = document.createElement('div');
+            option.className = 'option';
+            option.dataset.value = code;
             option.textContent = code;
-            countryFilter.appendChild(option);
+            option.addEventListener('click', () => selectCountry(code, code));
+            countryOptionsContainer.appendChild(option);
         });
+    }
+
+    function selectCountry(value, text) {
+        selectedCountryEl.textContent = text;
+        customDropdown.dataset.value = value;
+        customDropdown.classList.remove('active');
+
+        // Hapus kelas 'selected' dari semua opsi
+        countryOptionsContainer.querySelectorAll('.option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+
+        // Tambahkan kelas 'selected' ke opsi yang diklik
+        const selectedOption = countryOptionsContainer.querySelector(`.option[data-value="${value}"]`);
+        if (selectedOption) {
+            selectedOption.classList.add('selected');
+        }
+
+        applyAllFilters();
     }
 
     function renderServers(serversToRender) {
@@ -127,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 card.innerHTML = `
                     <div class="server-details">
                         <p class="provider">
-                            <img src="https://flagcdn.com/16x12/${server.country_code.toLowerCase()}.png" alt="${server.country_code}">
+                            <span class="country-code">${server.country_code}</span>
                             ${server.provider}
                         </p>
                         <p class="address">${server.ip}:${server.port}</p>
@@ -138,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 serverListContainer.appendChild(card);
             });
         }
-        pingAllVisibleServers();
+        // pingAllVisibleServers(); // Dihapus untuk mencegah ping otomatis
     }
 
     async function detectUserInfo() {
@@ -162,15 +245,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (hostFromUrl) {
             workerHostInput.value = hostFromUrl;
         }
-
-        if (workerInfoCard) {
-            if (hostFromUrl) {
-                workerInfoCard.querySelector('h4').textContent = hostFromUrl;
-            } else {
-                workerInfoCard.querySelector('h4').textContent = 'Default';
-                workerInfoCard.querySelector('p').textContent = 'Using default worker host';
-            }
-        }
         
         if (!uuidInput.value) {
             uuidInput.value = generateUUIDv4();
@@ -178,106 +252,78 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // =======================================================
-    // FUNGSI PING (VERSI 3.0 - THE DEFINITIVE WEBSOCKET PING)
+    // FUNGSI PING (VERSI 4.0 - WORKER-BASED PING)
     // =======================================================
     
-    /**
-     * Mengukur latensi koneksi dengan mencoba membuka koneksi WebSocket.
-     * Metode ini lebih andal untuk koneksi lintas-asal (cross-origin).
-     * @param {string} ip - Alamat IP server.
-     * @param {string} port - Port server.
-     * @param {number} timeout - Waktu timeout dalam milidetik.
-     * @returns {Promise<number>} - Promise yang akan resolve dengan nilai ping atau -1 jika gagal.
-     */
-    function pingServer(ip, port, timeout = 3000) {
-        return new Promise((resolve) => {
-            const startTime = Date.now();
-            let ws;
-            let resolved = false;
-    
-            // Fungsi cleanup yang akan dipanggil di setiap hasil
-            const cleanupAndResolve = (ping) => {
-                if (!resolved) {
-                    resolved = true;
-                    if (ws && ws.readyState !== WebSocket.CLOSED) {
-                        ws.close();
-                    }
-                    clearTimeout(timer);
-                    resolve(ping);
-                }
-            };
-            
-            // Timer untuk timeout
-            const timer = setTimeout(() => {
-                cleanupAndResolve(-1);
-            }, timeout);
-    
-            try {
-                // Kita coba koneksi WSS (WebSocket Secure). 
-                // Browser akan mengizinkan ini dari halaman HTTPS.
-                ws = new WebSocket(`wss://${ip}:${port}`);
-    
-                // KASUS 1: Koneksi berhasil dibuat. Ini adalah hasil terbaik.
-                // Server merespons handshake WebSocket.
-                ws.onopen = () => {
-                    const endTime = Date.now();
-                    cleanupAndResolve(endTime - startTime);
-                };
-    
-                // KASUS 2 (PALING UMUM): Koneksi gagal.
-                // Ini bisa karena port ditutup, tidak ada server WS, atau sertifikat tidak valid.
-                // TAPI, event 'onerror' ini sendiri sudah membuktikan bahwa servernya "menjawab".
-                // Kita tetap bisa mengukur waktunya!
-                ws.onerror = () => {
-                    const endTime = Date.now();
-                    // Kita anggap latensi hingga error ini sebagai nilai ping.
-                    cleanupAndResolve(endTime - startTime);
-                };
-    
-                // KASUS 3: Server menutup koneksi secara langsung.
-                ws.onclose = () => {
-                    // Jika onopen atau onerror belum terpanggil, kita ukur waktunya di sini.
-                    const endTime = Date.now();
-                    cleanupAndResolve(endTime - startTime);
-                };
-    
-            } catch (error) {
-                // Gagal bahkan sebelum mencoba membuat WebSocket (misal, format URL salah)
-                cleanupAndResolve(-1);
+    async function pingServer(ip, port, timeout = 8000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+
+        try {
+            const response = await fetch(activePingTesterUrl, {
+                method: 'POST',
+                signal: controller.signal,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ip, port }),
+            });
+
+            clearTimeout(id);
+
+            if (!response.ok) {
+                console.error(`Ping worker returned an error for ${ip}:${port}: ${response.statusText}`);
+                return -1;
             }
-        });
+
+            const data = await response.json();
+            return data.ping;
+
+        } catch (error) {
+            clearTimeout(id);
+            if (error.name === 'AbortError') {
+                console.warn(`Ping request for ${ip}:${port} timed out.`);
+            } else {
+                console.error(`Error pinging ${ip}:${port} via worker:`, error);
+            }
+            return -1;
+        }
     }
 
     async function pingAllVisibleServers() {
-        const serverCards = serverListContainer.querySelectorAll('.server-card');
-        
-        const pingPromises = Array.from(serverCards).map(async (card) => {
+        const serverCards = Array.from(serverListContainer.querySelectorAll('.server-card'));
+
+        for (const card of serverCards) {
             const serverId = card.dataset.serverId;
-            if (!serverId) return;
+            if (!serverId) continue;
+
             const [ip, port] = serverId.split(':');
             const pingBadge = card.querySelector('.ping-badge');
-            
-            if (pingBadge) {
-                pingBadge.textContent = '...'; // Reset before pinging
-                pingBadge.style.backgroundColor = '';
 
+            if (pingBadge) {
+                // Atur ulang badge menjadi '...' sebelum ping
+                requestAnimationFrame(() => {
+                    pingBadge.textContent = '...';
+                    pingBadge.style.backgroundColor = '';
+                });
+
+                // Tunggu hasil ping untuk server ini sebelum melanjutkan ke server berikutnya
                 const pingValue = await pingServer(ip, port);
-                
+
+                // Perbarui UI dengan hasil ping
                 requestAnimationFrame(() => {
                     if (pingValue === -1) {
                         pingBadge.textContent = 'N/A';
-                        pingBadge.style.backgroundColor = 'var(--danger-color)';
+                        pingBadge.style.backgroundColor = '#555';
                     } else {
                         pingBadge.textContent = `${pingValue} ms`;
-                        if (pingValue < 300) pingBadge.style.backgroundColor = 'var(--primary-green)';
-                        else if (pingValue < 600) pingBadge.style.backgroundColor = '#fdd835';
-                        else pingBadge.style.backgroundColor = '#ff8a80';
+                        if (pingValue < 250) pingBadge.style.backgroundColor = 'var(--cyber-cyan)';
+                        else if (pingValue < 1000) pingBadge.style.backgroundColor = '#fdd835';
+                        else pingBadge.style.backgroundColor = 'var(--primary-demonic)';
                     }
                 });
             }
-        });
-
-        await Promise.all(pingPromises);
+        }
     }
 
     // =======================================================
@@ -306,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function applyAllFilters() {
         const query = searchInput.value.toLowerCase();
-        const selectedCountry = countryFilter.value;
+        const selectedCountry = customDropdown.dataset.value || 'all';
         
         let serversToDisplay = allServers;
         if (isShowingOnlySelected) {
@@ -348,11 +394,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 const name = `${server.country_code} ${server.provider} [${server.ip}]`;
                 const useTls = tlsSelect.value === 'true';
                 
-                const uri = `${protocolSelect.value}://${uuid}@${bugCdn}:${useTls ? 443 : 80}` +
+                // --- LOGIKA DIPERBAIKI ---
+                // Alamat (Address) harus IP:PORT dari server proxy.
+                // Host header (host) harus bugCdn.
+                // SNI (sni) harus workerHost.
+                const uri = `${protocolSelect.value}://${uuid}@${server.ip}:${server.port}` +
                             `?encryption=none&type=ws` +
-                            `&host=${workerHost}` +
+                            `&host=${bugCdn}` + // Host header adalah Bug CDN
                             `&security=${useTls ? 'tls' : 'none'}` +
-                            `&sni=${workerHost}` +
+                            `&sni=${workerHost}` + // SNI adalah Worker Host
                             `&path=${encodeURIComponent(path)}` +
                             `#${encodeURIComponent(name)}`;
                 outputUris.push(uri);
@@ -375,7 +425,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // EVENT LISTENERS
     // =======================================================
     
-    countryFilter.addEventListener('change', applyAllFilters);
     searchInput.addEventListener('input', applyAllFilters);
 
     selectedCountBtn.addEventListener('click', () => {
@@ -398,8 +447,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     exportBtn.addEventListener('click', exportProxies);
-    // Bonus: Re-ping saat tombol settings ditekan
-    settingsBtn.addEventListener('click', pingAllVisibleServers);
+    repingBtn.addEventListener('click', () => {
+        showToast("Memulai ulang tes ping...");
+        pingAllVisibleServers();
+    });
+
+    // Event listener untuk dropdown kustom
+    customDropdown.querySelector('.dropdown-selected').addEventListener('click', () => {
+        customDropdown.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!customDropdown.contains(event.target)) {
+            customDropdown.classList.remove('active');
+        }
+    });
 
     // Jalankan aplikasi
     initializeApp();
