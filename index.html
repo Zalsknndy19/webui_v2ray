@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heavenly Demons</title>
+    <title>ZHStore VPN Configurator</title>
+    <link rel="icon" href="https://zhwifi.web.id/favicon.ico">
     
     <script>
         // Suntik CSS dengan cache busting
@@ -14,57 +15,40 @@
 <body>
     <div class="container">
         <header>
-            <div class="title-container">
-                <a href="https://zhwifi.web.id" class="logo">
-                    <h1>Heavenly Demons</h1>
-                </a>
-                <a href="https://t.me/Heavenlydemonsimmortal" class="telegram-link" target="_blank" rel="noopener noreferrer">@Heavenlydemonsimmortal</a>
-            </div>
+            <a href="https://zhwifi.web.id" class="logo">
+                <img src="https://zhwifi.web.id/favicon.ico" width="10%">
+                <h1>ZHStore Configurator</h1>
+            </a>
         </header>
 
         <main>
             <div class="info-grid">
-                <!-- Baris 1: Kontrol Utama -->
-                <div class="info-card search-box" style="grid-area: search;">
-
-                    <input type="text" id="search-input" placeholder="Cari server...">
+                <div class="info-card">
+                    <span class="icon">🌐</span>
+                    <div>
+                        <p>Your ISP</p>
+                        <h4 id="isp-info">Detecting...</h4>
+                    </div>
                 </div>
-                <div class="info-card" id="country-filter-container" style="grid-area: country;">
+                <div class="info-card">
+                    <span class="icon">📍</span>
+                    <div>
+                        <p>Your Location</p>
+                        <h4 id="location-info">Detecting...</h4>
+                    </div>
+                </div>
+                <div class="info-card" id="worker-info">
+                  <span class="icon">🚀</span>
+                  <div>
+                      <p>Active Worker Host</p>
+                      <h4>Loading...</h4>
+                  </div>
+                </div>
+                <div class="info-card">
                     <span class="icon">🌍</span>
-                    <div class="custom-dropdown">
-                        <div class="dropdown-selected" tabindex="0">
-                            <span id="selected-country">Pilih Negara</span>
-                        </div>
-                        <div class="dropdown-options" id="country-options">
-                            <!-- Opsi diisi oleh script.js -->
-                        </div>
-                    </div>
-                </div>
-                <div class="info-card" id="settings-btn" style="grid-area: settings;">
-                    <span class="icon">⚙️</span>
-                    <div>
-                        <h4>Pengaturan</h4>
-                    </div>
-                </div>
-
-                <!-- Baris 2: Info & URL Kustom -->
-                <div class="info-card" id="worker-input-card" style="grid-area: worker;">
-
-                    <input type="text" id="ping-worker-url" placeholder="URL Ping Kustom...">
-                </div>
-                <div class="info-card" style="grid-area: provider;">
-
-                    <div>
-                        <p>Provider</p>
-                        <h4 id="isp-info">Mendeteksi...</h4>
-                    </div>
-                </div>
-                <div class="info-card" style="grid-area: location;">
-
-                    <div>
-                        <p>Lokasi</p>
-                        <h4 id="location-info">Mendeteksi...</h4>
-                    </div>
+                    <select id="country-filter">
+                        <option value="all">All Countries</option>
+                    </select>
                 </div>
             </div>
 
@@ -75,9 +59,13 @@
     </div>
 
     <footer class="controls-footer">
+        <div class="search-box">
+            <span class="icon">🔍</span>
+            <input type="text" id="search-input" placeholder="Cari provider atau negara...">
+        </div>
         <div class="control-buttons">
             <button class="btn" id="selected-count-btn">0 proxies</button>
-            <button class="btn" id="reping-btn">Test Ping</button>
+            <button class="btn" id="settings-btn">Settings</button>
             <button class="btn primary" id="export-btn">Export</button>
         </div>
     </footer>

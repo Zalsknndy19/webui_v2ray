@@ -1,18 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Exo+2:wght@400;600&display=swap');
-
 /* --- Definisi Warna & Font --- */
 :root {
-    --bg-dark: #0a0a0a;
-    --primary-demonic: #ff003c; /* Merah Neon */
-    --cyber-cyan: #00f6ff;      /* Sian Neon */
-    --text-light: #e0e0e0;
-    --text-dark: #0a0a0a;
-    --surface-light: #1a1a1a;
-    --border-color: #ff003c;   /* Border merah */
-    --danger-color: #e0115f;     /* Magenta untuk error */
+    --bg-dark: #282e2e;
+    --primary-green: #7ecca0;
+    --text-light: #f0f0f0;
+    --text-dark: #1a1a1a;
+    --surface-light: #3a4141;
+    --border-color: #4a5252;
+    --danger-color: #ff8a80;
 
-    --font-main: 'Exo 2', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --font-titles: 'Orbitron', 'Courier New', monospace;
+    --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: 'Fira Code', 'Courier New', monospace;
 }
 
 /* --- Reset & Dasar --- */
@@ -20,7 +17,6 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    border-radius: 0; /* Menghilangkan semua sudut bulat */
 }
 
 body {
@@ -28,8 +24,6 @@ body {
     background-color: var(--bg-dark);
     color: var(--text-light);
     font-size: 16px;
-    background-image: linear-gradient(rgba(10, 10, 10, 0.95), rgba(10, 10, 10, 0.95)),
-                      url('https://www.transparenttextures.com/patterns/diagmonds.png'); /* Pola latar halus */
 }
 
 /* --- Layout Utama --- */
@@ -41,36 +35,11 @@ body {
 
 header {
     display: flex;
-    justify-content: center; /* Mengubah ke tengah */
+    justify-content: space-between;
     align-items: center;
-    text-align: center; /* Memastikan teks di tengah */
     padding: 15px 0;
     border-bottom: 2px solid var(--border-color);
-    box-shadow: 0 2px 15px -5px var(--border-color);
 }
-
-.title-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-}
-
-.telegram-link {
-    color: var(--primary-demonic);
-    text-decoration: none;
-    font-size: 0.9em;
-    font-weight: 600;
-    letter-spacing: 1px;
-    transition: all 0.2s ease;
-    text-shadow: 0 0 5px var(--primary-demonic);
-}
-
-.telegram-link:hover {
-    color: var(--cyber-cyan);
-    text-shadow: 0 0 8px var(--cyber-cyan);
-}
-
 
 /* --- Header & Logo --- */
 .logo {
@@ -80,180 +49,133 @@ header {
     text-decoration: none;
     color: var(--text-light);
 }
+.logo svg {
+    width: 40px;
+    height: 40px;
+}
 .logo h1 {
-    font-family: var(--font-titles);
-    font-size: 1.8em;
-    font-weight: 700;
-    color: var(--cyber-cyan);
-    text-shadow: 0 0 5px var(--cyber-cyan), 0 0 10px var(--cyber-cyan);
+    font-size: 1.5em;
+    font-weight: 600;
 }
 
 /* --- Kartu Informasi Atas --- */
 .info-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-areas:
-        "search country settings"
-        "worker provider location";
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 15px;
     margin: 20px 0;
 }
 .info-card {
     background-color: var(--surface-light);
-    border: 1px solid #333;
+    border-radius: 12px;
     padding: 15px;
     display: flex;
-    flex-direction: column; /* Menumpuk ikon dan teks secara vertikal */
-    align-items: center; /* Menengahkan secara horizontal */
-    justify-content: center; /* Menengahkan secara vertikal */
-    text-align: center;
-    transition: all 0.2s ease;
-}
-
-.info-card > div {
-    display: flex;
-    flex-direction: column;
     align-items: center;
+    gap: 15px;
 }
-.info-card:hover {
-    border-color: var(--cyber-cyan);
-    box-shadow: 0 0 5px var(--cyber-cyan);
+.info-card .icon {
+    font-size: 1.8em;
 }
-
-/* Membuat kartu Settings dapat diklik */
-#settings-btn {
-    cursor: pointer;
-}
-
 .info-card p {
     font-size: 0.9em;
-    color: #aaa;
+    color: #ccc;
 }
 .info-card h4 {
     font-size: 1.1em;
-    font-family: var(--font-main);
-    font-weight: 600;
-    color: var(--cyber-cyan);
+    font-family: var(--font-mono);
 }
 .info-card select {
     width: 100%;
-    background-color: var(--bg-dark);
+    background-color: var(--border-color);
     color: var(--text-light);
-    border: 1px solid var(--border-color);
+    border: none;
     padding: 8px;
+    border-radius: 6px;
     font-size: 1em;
-}
-.info-card select:focus {
-    outline: none;
-    border-color: var(--cyber-cyan);
-    box-shadow: 0 0 10px var(--cyber-cyan);
 }
 
 /* --- Daftar Server --- */
+.server-list-container {
+    /* Placeholder untuk daftar server */
+}
 .server-group-title {
     text-transform: uppercase;
     font-weight: bold;
-    color: var(--primary-demonic);
+    color: #aaa;
     margin: 30px 0 10px 0;
     font-size: 0.9em;
-    text-shadow: 0 0 5px var(--primary-demonic);
 }
+/* Placeholder style, akan diisi oleh JS */
 .server-card {
     background-color: var(--surface-light);
+    border-radius: 12px;
     padding: 15px;
     margin-bottom: 10px;
     cursor: pointer;
-    border: 1px solid #333;
-    border-left: 5px solid #555;
+    border-left: 5px solid var(--border-color);
     transition: all 0.2s ease;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 .server-card:hover {
-    border-left-color: var(--cyber-cyan);
-    background-color: #2a2a2a;
-    box-shadow: 0 0 8px var(--cyber-cyan);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 .server-card.selected {
-    border-left-color: var(--primary-demonic);
-    background-color: #221a1d;
-    box-shadow: inset 0 0 10px var(--primary-demonic), 0 0 10px var(--primary-demonic);
+    border-left-color: var(--primary-green);
+    background-color: #434c4c;
 }
 .server-details .provider {
     font-weight: 600;
-    color: var(--text-light);
-    display: flex; /* Menggunakan flexbox untuk penyejajaran */
-    align-items: center;
-    gap: 8px; /* Jarak antara kode negara dan nama provider */
 }
-
-.country-code {
-    background-color: #333;
-    color: var(--cyber-cyan);
-    padding: 2px 6px;
-    font-size: 0.8em;
-    font-weight: bold;
-    text-transform: uppercase;
-    border: 1px solid var(--cyber-cyan);
-    box-shadow: 0 0 4px var(--cyber-cyan);
-}
-
 .server-details .address {
-    font-family: var(--font-main);
+    font-family: var(--font-mono);
     font-size: 0.9em;
-    color: #aaa;
+    color: #ccc;
 }
 .ping-badge {
-    background-color: #333;
-    color: var(--text-light);
+    background-color: var(--primary-green);
+    color: var(--text-dark);
     font-weight: bold;
     padding: 4px 10px;
+    border-radius: 20px;
     font-size: 0.9em;
-    min-width: 60px;
-    text-align: center;
 }
 
 /* --- Footer & Kontrol --- */
 .controls-footer {
     position: sticky;
     bottom: 0;
-    background-color: rgba(10, 10, 10, 0.85);
+    background-color: rgba(40, 46, 46, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     padding: 15px;
-    border-top: 2px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
     margin: 20px -15px -15px -15px;
     display: grid;
-    grid-template-columns: 1fr; /* Diubah menjadi 1 kolom */
+    grid-template-columns: 1fr 1fr;
     gap: 15px;
     align-items: center;
-    box-shadow: 0 -2px 15px -5px var(--border-color);
 }
-
-/* Penyesuaian untuk search-box di dalam info-grid */
-.info-card.search-box {
-    padding: 0; /* Hapus padding dari kartu */
-    position: relative; /* Agar ikon bisa diposisikan */
+.search-box {
+    position: relative;
 }
-
 .search-box input {
     width: 100%;
-    height: 100%;
-    background-color: transparent;
-    border: none; /* Hapus border dari input */
-    padding: 15px; /* Hapus padding ekstra untuk ikon */
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 12px 12px 40px;
     color: var(--text-light);
     font-size: 1em;
-    font-family: var(--font-main);
-    transition: all 0.2s ease;
-    text-align: center; /* Tengahkan placeholder */
 }
-
-.search-box input:focus {
-    outline: none;
-    border-color: var(--cyber-cyan);
-    box-shadow: 0 0 10px var(--cyber-cyan);
+.search-box .icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
 }
 
 .control-buttons {
@@ -264,262 +186,103 @@ header {
 .btn {
     background-color: var(--surface-light);
     color: var(--text-light);
-    border: 1px solid var(--cyber-cyan);
+    border: 1px solid var(--border-color);
     padding: 12px;
+    border-radius: 8px;
     font-size: 1em;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease;
     text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 1px;
 }
 .btn.primary {
-    background-color: transparent;
-    color: var(--primary-demonic);
-    border-color: var(--primary-demonic);
+    background-color: var(--primary-green);
+    color: var(--text-dark);
+    border-color: var(--primary-green);
     font-weight: bold;
-    box-shadow: 0 0 5px var(--primary-demonic);
 }
 .btn:hover {
-    background-color: var(--cyber-cyan);
-    color: var(--text-dark);
-    text-shadow: none;
-    box-shadow: 0 0 15px var(--cyber-cyan);
+    background-color: var(--border-color);
 }
 .btn.primary:hover {
-    background-color: var(--primary-demonic);
-    color: var(--text-light);
-    text-shadow: 0 0 5px var(--text-light);
-    box-shadow: 0 0 20px var(--primary-demonic);
+    background-color: #69b88f;
 }
-
-/* --- Modal Settings --- */
+/* --- Gaya Baru untuk Modal Settings --- */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(10, 10, 10, 0.8);
-    backdrop-filter: blur(5px);
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 2000;
+    /* Mulai dengan tersembunyi */
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
+
 .modal-overlay.visible {
     opacity: 1;
     visibility: visible;
 }
+
 .modal-content {
     background-color: var(--bg-dark);
     padding: 25px;
+    border-radius: 12px;
     width: 90%;
     max-width: 500px;
-    border: 2px solid var(--primary-demonic);
-    box-shadow: 0 0 25px var(--primary-demonic);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 }
+
+.form-group {
+    margin-bottom: 15px;
+}
+
 .form-group label {
     display: block;
     margin-bottom: 5px;
-    color: var(--cyber-cyan);
+    color: #ccc;
     font-size: 0.9em;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
+
 .form-group input,
 .form-group select {
     width: 100%;
     padding: 10px;
     font-size: 1em;
     background-color: var(--surface-light);
-    border: 1px solid #333;
+    border: 1px solid var(--border-color);
     color: var(--text-light);
-    transition: all 0.2s ease;
+    border-radius: 6px;
 }
-.form-group input:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: var(--cyber-cyan);
-    box-shadow: 0 0 10px var(--cyber-cyan);
-}
-
-/* --- Toast Notification --- */
+/* --- Gaya untuk Toast Notification --- */
 .toast-notification {
     position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: var(--cyber-cyan);
+    background-color: var(--primary-green);
     color: var(--text-dark);
     padding: 12px 25px;
-    font-weight: 600;
+    border-radius: 25px;
+    font-weight: 500;
     z-index: 3000;
     opacity: 0;
     transition: opacity 0.3s ease, bottom 0.3s ease;
-    box-shadow: 0 0 15px var(--cyber-cyan);
-    border: 1px solid var(--cyber-cyan);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
+
 .toast-notification.visible {
     bottom: 90px;
     opacity: 1;
 }
+
 .toast-notification.error {
     background-color: var(--danger-color);
-    color: var(--text-light);
-    box-shadow: 0 0 15px var(--danger-color);
-    border-color: var(--danger-color);
-}
-
-/* --- Gaya Input Worker Ping --- */
-#worker-input-card {
-    padding: 0;
-    position: relative;
-}
-
-#ping-worker-url {
-    width: 100%;
-    height: 100%;
-    background-color: transparent;
-    border: none;
-    padding: 15px;
-    color: var(--text-light);
-    font-size: 1em;
-    font-family: var(--font-main);
-    transition: all 0.2s ease;
-    text-align: center; /* Menengahkan placeholder */
-}
-
-#ping-worker-url:focus {
-    outline: none;
-    border-color: var(--cyber-cyan);
-    box-shadow: 0 0 10px var(--cyber-cyan);
-}
-
-/* --- Gaya Dropdown Kustom --- */
-#country-filter-container {
-    /* Padding now inherited from .info-card for consistency */
-    position: relative;
-    padding: 15px; /* Explicitly reset to match .info-card */
-}
-
-.custom-dropdown {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
-.dropdown-selected {
-    width: 100%;
-    height: 100%;
-    padding: 0; /* Remove padding to allow perfect centering */
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Center text horizontally */
-    color: var(--cyber-cyan); /* Set color to cyan to match other cards */
-    font-size: 1.1em; /* Match font-size of other h4 elements */
-    font-weight: 600; /* Match font-weight of other h4 elements */
-    font-family: var(--font-main);
-    transition: all 0.2s ease;
-    outline: none;
-}
-
-.dropdown-selected:focus,
-.custom-dropdown.active .dropdown-selected {
-    color: var(--cyber-cyan);
-}
-
-.dropdown-options {
-    position: absolute;
-    top: 105%;
-    left: 0;
-    right: 0;
-    background-color: var(--surface-light);
-    border: 1px solid var(--border-color);
-    z-index: 1000;
-    max-height: 250px;
-    overflow-y: auto;
-    display: none; /* Sembunyikan secara default */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-}
-
-.custom-dropdown.active .dropdown-options {
-    display: block; /* Tampilkan saat aktif */
-}
-
-.dropdown-options .option {
-    padding: 12px 15px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border-bottom: 1px solid #2a2a2a;
-}
-.dropdown-options .option:last-child {
-    border-bottom: none;
-}
-
-.dropdown-options .option:hover,
-.dropdown-options .option.selected {
-    background-color: var(--primary-demonic);
-    color: var(--text-light);
-    text-shadow: 0 0 5px var(--text-light);
-}
-
-/* Scrollbar styling */
-.dropdown-options::-webkit-scrollbar {
-    width: 8px;
-}
-.dropdown-options::-webkit-scrollbar-track {
-    background: var(--bg-dark);
-}
-.dropdown-options::-webkit-scrollbar-thumb {
-    background-color: var(--primary-demonic);
-    border: 2px solid var(--primary-demonic);
-}
-
-/* --- Responsif untuk Seluler --- */
-@media (max-width: 768px) {
-    .info-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 kolom untuk baris pertama */
-        grid-template-areas:
-            "search worker"  /* Cari & URL Kustom di baris 1 */
-            "country country" /* Negara di baris 2, mengambil lebar penuh */
-            "settings settings" /* Pengaturan di baris 3 */
-            "provider provider" /* Provider di baris 4 */
-            "location location"; /* Lokasi di baris 5 */
-        gap: 8px;
-    }
-
-    .info-card {
-        padding: 8px; /* Mengurangi padding di dalam kartu */
-        gap: 8px;
-    }
-
-    .info-card .icon {
-        font-size: 1.5em; /* Memperkecil ikon */
-    }
-
-    .info-card p {
-        font-size: 0.8em; /* Memperkecil teks paragraf */
-    }
-
-    .info-card h4 {
-        font-size: 1em; /* Memperkecil teks judul */
-    }
-
-    .search-box input,
-    #ping-worker-url {
-        font-size: 0.9em;
-        padding-left: 40px; /* Sesuaikan padding untuk ikon yang lebih kecil */
-    }
-
-    .custom-dropdown .dropdown-selected {
-        font-size: 0.9em;
-    }
 }
