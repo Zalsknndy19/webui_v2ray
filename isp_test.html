@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uji Coba Deteksi ISP & Lokasi</title>
+    
+    <!-- Kita akan menggunakan style.css yang sudah ada agar konsisten -->
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* Beberapa gaya tambahan khusus untuk halaman tes ini */
+        .test-card {
+            background-color: var(--surface-light);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-card h2 {
+            margin-top: 0;
+            color: var(--primary-green);
+        }
+        .result {
+            font-family: var(--font-mono);
+            background-color: var(--bg-dark);
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap; /* Agar teks panjang bisa wrap */
+            word-wrap: break-word;
+        }
+        .status {
+            font-weight: bold;
+        }
+        .status.success {
+            color: var(--primary-green);
+        }
+        .status.error {
+            color: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Tes Deteksi Info Jaringan</h1>
+            <p>Menguji beberapa API untuk mendapatkan ISP dan Lokasi.</p>
+        </header>
+
+        <main>
+            <!-- TES API #1: ipinfo.io (HTTPS) -->
+            <div class="test-card">
+                <h2>API 1: ipinfo.io (HTTPS)</h2>
+                <p>Status: <span id="status-1" class="status">Testing...</span></p>
+                <div id="result-1" class="result">Menunggu respons...</div>
+            </div>
+
+            <!-- TES API #2: ip-api.com (HTTPS) -->
+            <div class="test-card">
+                <h2>API 2: ip-api.com (HTTPS)</h2>
+                <p>Status: <span id="status-2" class="status">Testing...</span></p>
+                <div id="result-2" class="result">Menunggu respons...</div>
+            </div>
+            
+            <!-- TES API #3: ip-api.com (HTTP - untuk melihat error mixed content) -->
+            <div class="test-card">
+                <h2>API 3: ip-api.com (HTTP)</h2>
+                <p>Status: <span id="status-3" class="status">Testing...</span></p>
+                <div id="result-3" class="result">Menunggu respons...</div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Fungsi generik untuk menjalankan tes
+            async function runTest(testNumber, url) {
+                const statusEl = document.getElementById(`status-${testNumber}`);
+                const resultEl = document.getElementById(`result-${testNumber}`);
+                
+                try {
+                    const response = await fetch(url, {
+                        // Tambahkan mode 'cors' untuk keamanan, meskipun defaultnya ini
+                        mode: 'cors',
+                        // Hapus cache untuk memastikan kita mendapatkan data segar
+                        cache: 'no-cache' 
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Jika sukses
+                    statusEl.textContent = 'SUCCESS';
+                    statusEl.className = 'status success';
+                    // Tampilkan semua data yang kita terima untuk debugging
+                    resultEl.textContent = JSON.stringify(data, null, 2); 
+                    
+                } catch (error) {
+                    // Jika gagal
+                    statusEl.textContent = 'ERROR';
+                    statusEl.className = 'status error';
+                    // Tampilkan pesan error yang detail
+                    resultEl.textContent = `Pesan Error: ${error.message}\n\n`;
+                    resultEl.textContent += `Tipe Error: ${error.name}\n\n`;
+                    resultEl.textContent += `URL: ${url}`;
+                }
+            }
+
+            // Jalankan semua tes saat halaman dimuat
+            runTest(1, 'https://ipinfo.io/json');
+            runTest(2, 'https://ip-api.com/json/?fields=status,message,country,countryCode,city,isp,org,query');
+            runTest(3, 'http://ip-api.com/json/?fields=status,message,country,countryCode,city,isp,org,query');
+        });
+    </script>
+</body>
+</html>
