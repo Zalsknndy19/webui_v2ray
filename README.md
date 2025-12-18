@@ -27,7 +27,7 @@ Ini adalah panduan untuk pengguna akhir yang ingin menggunakan aplikasi ini.
 1.  **Buka Halaman Aplikasi:** Kunjungi tautan [Live Demo](https://zalsknndy19.github.io/webui_v2ray/) di atas.
 2.  **(Opsional) Gunakan Worker Anda:** Jika Anda memiliki alamat Cloudflare Worker sendiri, tambahkan di akhir URL, contoh:
     ```
-    https://zalsknndy19.github.io/webui_v2ray/?host=worker-baru.domain.workers.dev
+    https://zalsknndy19.github.io/webui_v2ray/?host=domain.workers.kalian
     ```
 3.  **Buka Settings:** Klik tombol **"Settings"** di bagian bawah.
     - **Worker Host (SNI)** dan **UUID** seharusnya sudah terisi secara otomatis.
